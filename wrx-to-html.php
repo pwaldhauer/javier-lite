@@ -18,6 +18,7 @@ foreach ($xml->channel->item as $item) {
         continue;
     }
 
+
     $params = [
         'slug' => (string)$wp->post_name ?? (string)$wp->post_id,
         'title' => (string)$item->title,
@@ -41,7 +42,7 @@ foreach ($xml->channel->item as $item) {
         @mkdir('build/' . $path);
     }
 
-    $params['text'] = preg_replace_callback('/img.*src="(.*)"/isU', function ($m) use ($path, $ctx) {
+    $params['text'] = preg_replace_callback('/img.*?src="(.*?)"(.*?)\/>/is', function ($m) use ($path, $ctx) {
         $nonThumbnail = preg_replace('/-(\d+)x(\d+)\./', '.', $m[1]);
 
         if (!file_exists('build/' . $path . '/' . basename($nonThumbnail))) {
@@ -53,7 +54,7 @@ foreach ($xml->channel->item as $item) {
             }
         }
 
-        return sprintf('img src="%s"', basename($nonThumbnail));
+        return sprintf('img src="%s"%s/>', basename($nonThumbnail), $m[2]);
     }, $params['text']);
 
 
